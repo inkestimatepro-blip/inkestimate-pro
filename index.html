@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InkEstimate Pro - Oficial</title>
+    <title>InkEstimate Pro - Premium</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
@@ -19,17 +19,15 @@
         theme: {
           extend: {
             fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Cinzel', 'serif'] },
-            colors: {
-              ink: { 950: '#050505', 900: '#121212', 800: '#1E1E1E', 700: '#2A2A2A' },
-              gold: { 400: '#FFD700', 500: '#D4AF37', 600: '#AA8C2C' }
-            }
+            colors: { ink: { 950: '#050505', 900: '#121212', 800: '#1E1E1E' }, gold: { 400: '#FFD700', 500: '#D4AF37', 600: '#AA8C2C' } }
           }
         }
       }
     </script>
     <style>
-      body { background-color: #050505; color: #E5E5E5; }
-      .glass { background: rgba(30, 30, 30, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+      body { background-color: #050505; color: #E5E5E5; background-image: radial-gradient(circle at 50% 0%, #2a1f00 0%, #050505 60%); min-height: 100vh; }
+      .glass { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 215, 0, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+      .gold-glow { text-shadow: 0 0 15px rgba(212, 175, 55, 0.6); }
       .loading-dots:after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
       @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
     </style>
@@ -41,28 +39,23 @@
         const { useState, useEffect } = React;
         const { createClient } = supabase;
 
-        // --- CHAVES ---
+        // --- CONFIGURAÇÕES ---
         const GOOGLE_API_KEY = "AIzaSyBVUt_unky3f0D4qzDutg69HH7PxHQ6dso"; 
         const supabaseUrl = 'https://igmdplccgvlcfrffwgpm.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnbWRwbGNjZ3ZsY2ZyZmZ3Z3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1OTM0NDYsImV4cCI6MjA4NDE2OTQ0Nn0.Uy9NGijSIXytVYw-19szOXdet96uiY8xHQlW36K7xAg';
         const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-        // --- IA GOOGLE GEMINI ---
+        // --- FUNÇÃO IA SEGURA (FETCH) ---
         async function callGemini(prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GOOGLE_API_KEY}`;
             try {
-                const response = await fetch(url, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GOOGLE_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
-                return data.candidates[0].content.parts[0].text;
-            } catch (error) {
-                console.error(error);
-                return "Erro na IA. Tente novamente.";
-            }
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro: A IA não respondeu.";
+            } catch (error) { return "Erro de conexão com a IA."; }
         }
 
         const Icon = ({ name }) => <i data-lucide={name}></i>;
@@ -73,129 +66,156 @@
             const [loading, setLoading] = useState(false);
             const [activeTab, setActiveTab] = useState('price');
             
-            // Calculadora
+            // Estados
             const [width, setWidth] = useState(10);
             const [height, setHeight] = useState(10);
             const [complexity, setComplexity] = useState(1.0);
             const [price, setPrice] = useState(null);
-
-            // IA
             const [aiInput, setAiInput] = useState('');
             const [aiResult, setAiResult] = useState('');
             const [aiLoading, setAiLoading] = useState(false);
 
             useEffect(() => { lucide.createIcons(); }, [user, activeTab, price, aiResult]);
 
-            const handleLogin = async (e) => {
-                e.preventDefault();
+            const handleLogin = async () => {
                 setLoading(true);
                 const { data } = await supabaseClient.from('clientes').select('*').eq('email', email.trim().toLowerCase()).single();
-                if (data) setUser(data);
-                else alert('E-mail não encontrado!');
+                if (data) setUser(data); else alert('E-mail não encontrado! Verifique sua assinatura.');
                 setLoading(false);
             };
 
             const calculatePrice = () => {
-                const total = Math.ceil((100 + (width * height * 2.5)) * complexity);
-                setPrice(total);
+                setPrice(Math.ceil((100 + (width * height * 2.5)) * complexity));
             };
 
             const generateAI = async (type) => {
-                if (!aiInput) return alert('Digite algo!');
-                if ((user.credits || 0) < 1) return alert('Sem moedas!');
+                if (!aiInput) return alert('Descreva sua ideia primeiro!');
+                if ((user.credits || 0) < 1) return alert('Saldo insuficiente!');
                 
-                setAiLoading(true);
-                setAiResult('');
+                setAiLoading(true); setAiResult('');
                 
                 const newCredits = (user.credits || 0) - 1;
                 await supabaseClient.from('clientes').update({ credits: newCredits }).eq('id', user.id);
                 setUser({...user, credits: newCredits});
 
-                let prompt = type === 'stencil' 
-                    ? `Crie um guia técnico de stencil para tattoo: "${aiInput}". Camadas, sombras e agulhas.`
-                    : `Crie legenda de Instagram para tattoo: "${aiInput}". Use hashtags e emojis.`;
+                const prompt = type === 'stencil' 
+                    ? `Aja como um tatuador profissional. Crie um guia técnico de decalque/stencil para: "${aiInput}". \nSepare por: 1. Linhas de Base. 2. Marcação de Sombras. 3. Dicas de Agulha.` 
+                    : `Crie uma legenda de Instagram profissional para um tatuador postar a arte: "${aiInput}". \nInclua: Título, Texto engajador, Call to Action e Hashtags (#).`;
                 
                 const text = await callGemini(prompt);
                 setAiResult(text);
                 setAiLoading(false);
             };
 
-            // TELA DE LOGIN COM PLANOS
+            // --- TELA DE LOGIN (COM OS PLANOS) ---
             if (!user) {
                 return (
-                    <div className="min-h-screen bg-black flex flex-col items-center py-10 px-4">
-                        <div className="text-center mb-10">
-                            <div className="inline-block p-3 rounded-full bg-ink-900 border border-gold-500 mb-4"><Icon name="pen-tool" /></div>
-                            <h1 className="text-4xl font-display font-bold text-white">InkEstimate <span className="text-gold-500">Pro</span></h1>
-                            <p className="text-zinc-500 mt-2">Área do Membro</p>
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+                        <div className="text-center mb-10 animate-in">
+                            <div className="inline-block p-4 rounded-full bg-ink-900 border border-gold-500/50 mb-4 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                <Icon name="pen-tool" class="text-gold-500 w-8 h-8" />
+                            </div>
+                            <h1 className="text-5xl font-display font-bold text-white mb-2 gold-glow">InkEstimate <span className="text-gold-500">Pro</span></h1>
+                            <p className="text-zinc-400 tracking-widest uppercase text-sm">Plataforma de Elite para Tatuadores</p>
                         </div>
 
-                        {/* PLANOS DE VENDA (VOLTARAM!) */}
-                        <div className="grid md:grid-cols-3 gap-6 max-w-5xl w-full mb-12">
+                        {/* PLANOS DE VENDA */}
+                        <div className="grid md:grid-cols-3 gap-6 w-full max-w-5xl mb-12 px-4">
                             {[
-                                { name: 'Iniciante', price: '29,90', credits: 100, link: 'https://mpago.la/2p41zpx' },
-                                { name: 'Profissional', price: '59,90', credits: 400, link: 'https://mpago.la/342uX85', best: true },
-                                { name: 'Studio', price: '149,90', credits: 1000, link: 'https://mpago.la/1TJHEY3' }
+                                { name: 'Iniciante', price: '29,90', credits: 100, link: 'https://mpago.la/2p41zpx', feat: 'Acesso Básico' },
+                                { name: 'Profissional', price: '59,90', credits: 400, link: 'https://mpago.la/342uX85', feat: 'Acesso Completo + IA', best: true },
+                                { name: 'Studio', price: '149,90', credits: 1000, link: 'https://mpago.la/1TJHEY3', feat: 'Multi-usuário' }
                             ].map(plan => (
-                                <div key={plan.name} className={`glass p-6 rounded-2xl relative ${plan.best ? 'border-gold-500 transform scale-105' : 'border-ink-800'}`}>
-                                    {plan.best && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold-500 text-black text-xs font-bold px-3 py-1 rounded-full">MAIS VENDIDO</span>}
-                                    <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                                    <div className="text-3xl font-bold text-gold-500 mb-4">R$ {plan.price}</div>
-                                    <p className="text-sm text-zinc-400 mb-6 flex items-center gap-2"><Icon name="coins" /> {plan.credits} Moedas</p>
-                                    <a href={plan.link} target="_blank" className={`block text-center w-full py-3 rounded-xl font-bold ${plan.best ? 'bg-gold-500 text-black' : 'bg-ink-800 text-white'}`}>Assinar</a>
+                                <div key={plan.name} className={`glass p-6 rounded-2xl relative transition-all hover:-translate-y-2 ${plan.best ? 'border-gold-500/50 bg-gold-500/5' : 'border-white/5'}`}>
+                                    {plan.best && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold-500 text-black text-[10px] font-bold px-3 py-1 rounded-full">RECOMENDADO</span>}
+                                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                                    <div className="text-3xl font-display font-bold text-gold-500 my-3">R$ {plan.price}</div>
+                                    <ul className="text-sm text-zinc-400 mb-6 space-y-2">
+                                        <li className="flex items-center gap-2"><Icon name="coins" /> {plan.credits} Moedas</li>
+                                        <li className="flex items-center gap-2"><Icon name="check" /> {plan.feat}</li>
+                                    </ul>
+                                    <a href={plan.link} target="_blank" className={`block w-full py-3 rounded-xl font-bold text-center text-sm uppercase tracking-widest ${plan.best ? 'bg-gold-500 text-black hover:bg-gold-400' : 'bg-ink-800 text-white hover:bg-ink-700'}`}>Assinar Agora</a>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="glass p-8 rounded-2xl w-full max-w-md border border-ink-800">
-                            <p className="text-center text-zinc-400 mb-4 text-sm uppercase">Já é assinante?</p>
-                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Seu E-mail" className="w-full bg-ink-950 border border-ink-700 text-white p-3 rounded-lg mb-4 text-center focus:border-gold-500 outline-none" />
-                            <button onClick={handleLogin} disabled={loading} className="w-full bg-gold-500 text-black font-bold p-3 rounded-lg hover:bg-gold-400">
-                                {loading ? 'Entrando...' : 'ACESSAR SISTEMA'}
+                        {/* LOGIN */}
+                        <div className="glass p-8 rounded-2xl w-full max-w-md border-t border-white/10">
+                            <p className="text-center text-zinc-500 text-xs uppercase font-bold mb-4">Área de Membros</p>
+                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Digite seu E-mail" className="w-full bg-ink-950 border border-ink-800 text-white p-4 rounded-xl mb-4 text-center focus:border-gold-500 outline-none transition-all" />
+                            <button onClick={handleLogin} disabled={loading} className="w-full bg-gold-500 text-black font-bold p-4 rounded-xl uppercase tracking-widest hover:bg-gold-400 transition-all shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                {loading ? 'Verificando...' : 'Entrar no Sistema'}
                             </button>
                         </div>
                     </div>
                 );
             }
 
-            // TELA DO SISTEMA
+            // --- TELA DO SISTEMA (DASHBOARD) ---
             return (
-                <div className="min-h-screen bg-ink-950 pb-20">
-                    <header className="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center mb-8 border-b border-white/5">
-                        <span className="font-display font-bold text-lg text-white">InkEstimate <span className="text-gold-500">Pro</span></span>
-                        <div className="flex items-center gap-2 bg-ink-900 px-3 py-1 rounded-full border border-gold-500/30">
-                            <span className="text-gold-500 font-bold text-sm">💰 {user.credits}</span>
-                        </div>
+                <div className="min-h-screen pb-20">
+                    <header className="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center mb-8">
+                        <span className="font-display font-bold text-lg text-white flex gap-2 items-center"><Icon name="pen-tool"/> InkEstimate <span className="text-gold-500">Pro</span></span>
+                        <span className="bg-ink-950 px-4 py-1.5 rounded-full text-gold-500 text-sm font-bold border border-gold-500/20 shadow-lg">💰 {user.credits}</span>
                     </header>
 
-                    <main className="max-w-3xl mx-auto px-4">
-                        <div className="flex gap-2 overflow-x-auto pb-4 mb-4">
+                    <main className="max-w-4xl mx-auto px-4">
+                        {/* MENU */}
+                        <div className="flex justify-center gap-3 mb-8 overflow-x-auto pb-2">
                             {[{id:'price', l:'Calculadora', i:'calculator'}, {id:'stencil', l:'IA Stencil', i:'layers'}, {id:'marketing', l:'IA Social', i:'instagram'}].map(t => (
-                                <button key={t.id} onClick={() => {setActiveTab(t.id); setAiResult('');}} className={`flex items-center gap-2 px-4 py-3 rounded-lg border whitespace-nowrap ${activeTab === t.id ? 'bg-gold-500 text-black border-gold-500 font-bold' : 'bg-ink-900 text-zinc-400 border-ink-800'}`}>
+                                <button key={t.id} onClick={() => { setActiveTab(t.id); setAiResult(''); }} className={`flex items-center gap-2 px-6 py-3 rounded-xl border transition-all ${activeTab === t.id ? 'bg-gold-500 text-black border-gold-500 font-bold shadow-lg shadow-gold-500/20' : 'glass text-zinc-400 border-white/5 hover:bg-white/5'}`}>
                                     <Icon name={t.i} /> {t.l}
                                 </button>
                             ))}
                         </div>
 
+                        {/* CALCULADORA */}
                         {activeTab === 'price' && (
-                            <div className="glass p-6 rounded-2xl border-t border-white/5 animate-in space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="text-xs font-bold text-zinc-500">LARGURA (CM)</label><input type="number" value={width} onChange={e => setWidth(Number(e.target.value))} className="w-full bg-ink-900 border border-ink-700 p-3 rounded-lg text-white font-bold text-center mt-1" /></div>
-                                    <div><label className="text-xs font-bold text-zinc-500">ALTURA (CM)</label><input type="number" value={height} onChange={e => setHeight(Number(e.target.value))} className="w-full bg-ink-900 border border-ink-700 p-3 rounded-lg text-white font-bold text-center mt-1" /></div>
+                            <div className="glass p-8 rounded-3xl animate-in grid md:grid-cols-2 gap-8 items-center">
+                                <div className="space-y-6">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div><label className="text-xs font-bold text-zinc-500 mb-2 block">LARGURA (CM)</label><input type="number" value={width} onChange={e=>setWidth(Number(e.target.value))} className="w-full bg-ink-950 border border-ink-800 p-4 rounded-xl text-white font-bold text-center text-xl focus:border-gold-500 outline-none"/></div>
+                                        <div><label className="text-xs font-bold text-zinc-500 mb-2 block">ALTURA (CM)</label><input type="number" value={height} onChange={e=>setHeight(Number(e.target.value))} className="w-full bg-ink-950 border border-ink-800 p-4 rounded-xl text-white font-bold text-center text-xl focus:border-gold-500 outline-none"/></div>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-zinc-500 mb-2 block">COMPLEXIDADE</label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {[{l:'Traço',v:1.0}, {l:'Sombra',v:1.3}, {l:'Realismo',v:1.8}].map(o => (
+                                                <button key={o.l} onClick={() => setComplexity(o.v)} className={`p-3 rounded-lg text-xs font-bold border transition-all ${complexity === o.v ? 'bg-gold-500/10 border-gold-500 text-gold-500' : 'bg-ink-950 border-ink-800 text-zinc-500'}`}>{o.l}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <button onClick={calculatePrice} className="w-full bg-white hover:bg-zinc-200 text-black font-black py-4 rounded-xl uppercase tracking-widest transition-all">Calcular Agora</button>
                                 </div>
-                                <div><label className="text-xs font-bold text-zinc-500">COMPLEXIDADE</label><div className="grid grid-cols-3 gap-2 mt-1">{[{l:'Traço',v:1.0},{l:'Sombra',v:1.3},{l:'Realismo',v:1.8}].map(o => <button key={o.l} onClick={() => setComplexity(o.v)} className={`p-2 rounded border text-sm ${complexity === o.v ? 'border-gold-500 text-gold-500' : 'border-ink-800 text-zinc-500'}`}>{o.l}</button>)}</div></div>
-                                <button onClick={calculatePrice} className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200">CALCULAR</button>
-                                {price && <div className="text-center mt-4 pt-4 border-t border-white/10"><div className="text-5xl font-display font-bold text-gold-500">R$ {price}</div></div>}
+                                <div className="text-center h-full flex flex-col justify-center bg-black/30 rounded-2xl p-6 border border-white/5">
+                                    {price ? (
+                                        <>
+                                            <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-2">Orçamento Sugerido</p>
+                                            <div className="text-6xl font-display font-bold text-gold-500 gold-glow mb-4">R$ {price}</div>
+                                            <p className="text-zinc-400 text-sm">Baseado em {width}x{height}cm</p>
+                                        </>
+                                    ) : <p className="text-zinc-600">Preencha os dados para calcular.</p>}
+                                </div>
                             </div>
                         )}
 
+                        {/* IA (STENCIL E MARKETING) */}
                         {(activeTab === 'stencil' || activeTab === 'marketing') && (
-                            <div className="glass p-6 rounded-2xl border-t border-white/5 animate-in">
-                                <textarea value={aiInput} onChange={e => setAiInput(e.target.value)} placeholder="Descreva sua ideia..." className="w-full h-32 bg-ink-900 border border-ink-700 rounded-lg p-4 text-white focus:border-gold-500 outline-none mb-4 resize-none"></textarea>
-                                <button onClick={() => generateAI(activeTab)} disabled={aiLoading} className="w-full bg-gold-500 text-black font-bold py-3 rounded-lg hover:bg-gold-400 flex justify-center gap-2">
-                                    {aiLoading ? <span className="loading-dots">CRIANDO</span> : <span>✨ GERAR (1 MOEDA)</span>}
+                            <div className="glass p-8 rounded-3xl animate-in border-t border-gold-500/20">
+                                <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-2">
+                                    <Icon name={activeTab === 'stencil' ? 'layers' : 'instagram'} class="text-gold-500"/>
+                                    {activeTab === 'stencil' ? 'Gerador de Stencil IA' : 'Marketing IA'}
+                                </h2>
+                                <textarea value={aiInput} onChange={e => setAiInput(e.target.value)} placeholder={activeTab === 'stencil' ? "Descreva a tattoo para o guia de decalque..." : "Descreva a tattoo para a legenda..."} className="w-full h-32 bg-ink-950 border border-ink-800 rounded-xl p-4 text-white focus:border-gold-500 outline-none mb-6 resize-none text-lg"></textarea>
+                                <button onClick={() => generateAI(activeTab)} disabled={aiLoading} className="w-full bg-gold-500 text-black font-bold py-4 rounded-xl uppercase tracking-widest hover:bg-gold-400 flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                    {aiLoading ? <span className="loading-dots">CRIANDO INTELIGÊNCIA</span> : <span>✨ GERAR GUIA (1 MOEDA)</span>}
                                 </button>
-                                {aiResult && <div className="mt-6 bg-ink-900 p-6 rounded-xl border border-ink-800 text-zinc-300 whitespace-pre-wrap">{aiResult}</div>}
+                                {aiResult && (
+                                    <div className="mt-8 bg-ink-950 p-6 rounded-2xl border border-ink-800 relative group">
+                                        <div className="text-zinc-300 whitespace-pre-wrap leading-relaxed text-sm">{aiResult}</div>
+                                        <button onClick={() => { navigator.clipboard.writeText(aiResult); alert('Copiado!'); }} className="absolute top-4 right-4 text-zinc-500 hover:text-gold-500 bg-ink-900 p-2 rounded-lg border border-ink-800"><Icon name="copy" /></button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </main>
