@@ -1,373 +1,206 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>InkEstimate Pro - Calculadora para Tatuadores</title>
-    <link rel="icon" type="image/svg+xml" href="https://lucide.dev/icons/pen-tool.svg" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InkEstimate Pro - Oficial</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;700&family=Playfair+Display:wght@400;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
     <script>
       tailwind.config = {
         theme: {
           extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              display: ['Cinzel', 'serif'],
-            },
+            fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Cinzel', 'serif'] },
             colors: {
-              ink: { 950: '#0a0a0a', 900: '#171717', 800: '#262626' },
-              gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+              ink: { 950: '#050505', 900: '#121212', 800: '#1E1E1E', 700: '#2A2A2A' },
+              gold: { 400: '#FFD700', 500: '#D4AF37', 600: '#AA8C2C' }
             }
           }
         }
       }
     </script>
     <style>
-      body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; }
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: #171717; }
-      ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-      .scrollbar-hide::-webkit-scrollbar { display: none; }
-      .animate-in { animation: fadeIn 0.5s ease-out forwards; }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      
-      /* Estilo do Detector de Erros */
-      #error-debug {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100%;
-        background: #7f1d1d;
-        color: white;
-        padding: 20px;
-        z-index: 9999;
-        font-family: monospace;
-        border-bottom: 2px solid #f87171;
-      }
+      body { background-color: #050505; color: #E5E5E5; }
+      .glass { background: rgba(30, 30, 30, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+      .loading-dots:after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
+      @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
     </style>
-    
-    <script>
-      window.onerror = function(msg, url, line) {
-        var trap = document.getElementById('error-debug');
-        trap.style.display = 'block';
-        trap.innerHTML = '<strong>🚨 ERRO DETECTADO:</strong><br>' + msg + '<br><small>Linha: ' + line + '</small>';
-        return false;
-      };
-    </script>
-
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@18.2.0",
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.263.1",
-        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.45.4"
-      }
-    }
-    </script>
 </head>
 <body>
-    <div id="error-debug"></div>
-    
     <div id="root"></div>
 
-    <script type="text/babel" data-type="module">
-        import React, { useState, useEffect } from 'react';
-        import ReactDOM from 'react-dom/client';
-        import { 
-          PenTool, User as UserIcon, History, Calculator, LogOut, 
-          Layers, Instagram, MessageSquare, Zap, Star, Trophy, 
-          Coins, Check, Share2, DollarSign, Trash2, Loader2, Info 
-        } from 'lucide-react';
-        import { createClient } from "@supabase/supabase-js";
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createClient } = supabase;
 
-        // =================================================================
-        // ÁREA SEGURA 
-        // =================================================================
-        
-        // SUA CHAVE DO GOOGLE (Guardada para quando reativarmos a IA)
+        // --- CHAVES ---
         const GOOGLE_API_KEY = "AIzaSyBVUt_unky3f0D4qzDutg69HH7PxHQ6dso"; 
-
-        // BANCO DE DADOS SUPABASE (CONEXÃO ATIVA)
         const supabaseUrl = 'https://igmdplccgvlcfrffwgpm.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnbWRwbGNjZ3ZsY2ZyZmZ3Z3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1OTM0NDYsImV4cCI6MjA4NDE2OTQ0Nn0.Uy9NGijSIXytVYw-19szOXdet96uiY8xHQlW36K7xAg';
-        
-        let supabase;
-        try {
-            supabase = createClient(supabaseUrl, supabaseKey);
-        } catch (e) {
-            console.error("Erro Supabase:", e);
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+        // --- IA GOOGLE GEMINI ---
+        async function callGemini(prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GOOGLE_API_KEY}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error(error);
+                return "Erro na IA. Tente novamente.";
+            }
         }
 
-        // =================================================================
+        const Icon = ({ name }) => <i data-lucide={name}></i>;
 
-        const DEFAULT_SETTINGS = {
-          hourlyRate: 250, 
-          pricePerCm2: 1.0, 
-          currency: 'R$',
-          materialCostBase: 99
-        };
-
-        const COMPLEXITY_MULTIPLIERS = { 
-            'Nível 1 - Apenas Traços': 1.0, 
-            'Nível 2 - Sombreado/B&G': 1.2, 
-            'Nível 3 - Colorido': 1.5, 
-            'Nível 4 - Cobertura/Cover-up': 1.8 
-        };
-
-        // --- TELA DE LOGIN ---
-        const AuthScreen = ({ onLogin }) => {
-          const [emailInput, setEmailInput] = useState('');
-          const [error, setError] = useState(null);
-          const [loading, setLoading] = useState(false);
-
-          const handleLoginSubmit = async (e) => {
-            e.preventDefault();
-            if (!emailInput.trim()) return;
-            setLoading(true); setError(null);
-            
-            try {
-               const { data, error: sbError } = await supabase.from('clientes').select('*').eq('email', emailInput.trim().toLowerCase()).single();
-               
-               if (data) { 
-                   onLogin({ ...data, email: emailInput }); 
-               } else {
-                   setError("E-mail não encontrado. Verifique se digitou corretamente.");
-               }
-            } catch (err) { 
-                setError("Erro de conexão. Tente novamente."); 
-            } finally { 
-                setLoading(false); 
-            }
-          };
-
-          const plans = [
-            { id: 'starter', name: 'Iniciante', price: '29,90', credits: 100, icon: Zap, link: 'https://mpago.la/2p41zpx', best: false },
-            { id: 'pro', name: 'Profissional', price: '59,90', credits: 400, icon: Star, link: 'https://mpago.la/342uX85', best: true },
-            { id: 'studio', name: 'Studio', price: '149,90', credits: 1000, icon: Trophy, link: 'https://mpago.la/1TJHEY3', best: false }
-          ];
-
-          return (
-            <div className="min-h-screen bg-ink-950 flex flex-col items-center py-12 px-6">
-              <header className="text-center mb-12 animate-in">
-                <div className="flex items-center justify-center gap-3 mb-8">
-                  <div className="bg-gold-500 p-2.5 rounded-2xl text-black shadow-2xl shadow-gold-500/20"><PenTool size={32} /></div>
-                  <h1 className="font-display font-bold text-3xl sm:text-4xl text-white">InkEstimate <span className="text-gold-500">Pro</span></h1>
-                </div>
-                <h2 className="text-4xl sm:text-6xl font-display font-bold text-white mb-6">A Revolução na <span className="text-gold-500">Precificação</span></h2>
-                <p className="text-zinc-400 text-lg max-w-xl mx-auto">IA para orçamentos e stencils de elite.</p>
-              </header>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mb-24">
-                {plans.map(p => (
-                  <div key={p.id} className={`flex flex-col bg-ink-900 border ${p.best ? 'border-gold-500 shadow-2xl scale-105 z-10' : 'border-ink-800'} rounded-[2.5rem] p-8 relative transition-all duration-300 hover:translate-y-[-8px]`}>
-                    {p.best && <div className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-gold-500 text-black text-[10px] font-black px-6 py-2 rounded-full uppercase">Membro Premium</div>}
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-ink-950 border border-ink-800"><p.icon size={32} className={p.best ? 'text-gold-500' : 'text-zinc-500'} /></div>
-                    <h3 className="text-3xl font-bold text-white mb-2">{p.name}</h3>
-                    <div className="flex items-baseline gap-1 mb-10"><span className="text-lg text-zinc-500 font-bold">R$</span><span className="text-6xl font-display font-bold text-white">{p.price}</span><span className="text-xs text-zinc-500 font-bold uppercase ml-2">/mês</span></div>
-                    <ul className="space-y-4 mb-10 flex-1 border-t border-ink-800 pt-8 text-sm">
-                      <li className="flex items-center gap-2"><Coins size={16} className="text-gold-500" /> {p.credits} Moedas Inclusas</li>
-                      <li className="flex items-center gap-2 text-zinc-400"><Check size={16} className="text-green-500" /> Stencils IA</li>
-                    </ul>
-                    <a href={p.link} target="_blank" className={`block w-full py-5 rounded-[1.5rem] text-xs font-black uppercase text-center transition-all ${p.best ? 'bg-gold-600 hover:bg-gold-500 text-black' : 'bg-white hover:bg-zinc-200 text-black'}`}>Assinar Agora</a>
-                  </div>
-                ))}
-              </div>
-
-              <footer className="w-full max-w-md p-8 border-t border-ink-800 text-center">
-                <p className="text-zinc-500 text-[10px] font-black uppercase mb-6 tracking-widest">Já é membro assinante?</p>
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
-                  <input type="email" value={emailInput} onChange={e => setEmailInput(e.target.value)} placeholder="Seu E-mail de Assinante" className="w-full bg-ink-900 border border-ink-800 rounded-2xl py-4 px-5 text-center text-white focus:border-gold-500 outline-none font-bold" />
-                  {error && <p className="text-red-500 text-[10px] font-black uppercase tracking-widest animate-pulse">{error}</p>}
-                  <button type="submit" disabled={loading} className="w-full py-4 bg-ink-900 border border-ink-800 text-zinc-400 hover:text-white rounded-2xl uppercase text-[10px] font-black tracking-widest flex items-center justify-center gap-2">
-                    {loading ? <Loader2 className="animate-spin" size={14} /> : "Acessar InkEstimate"}
-                  </button>
-                </form>
-              </footer>
-            </div>
-          );
-        };
-
-        // --- CALCULADORA ---
-        const ManualCalculator = ({ settings, onCalculate, useCredit }) => {
-          const [input, setInput] = useState({ width: 7, height: 7, complexity: 'Nível 1 - Apenas Traços', extras: 0 });
-          const [calculating, setCalculating] = useState(false);
-          
-          const calc = async () => {
-            setCalculating(true);
-            const success = await useCredit(1);
-            if (!success) {
-                setCalculating(false);
-                return;
-            }
-            
-            const area = input.width * input.height;
-            const sizePrice = area * settings.pricePerCm2 * (COMPLEXITY_MULTIPLIERS[input.complexity] || 1);
-            let finalPrice = settings.materialCostBase + sizePrice + Number(input.extras || 0);
-            finalPrice = Math.ceil(finalPrice / 10) * 10; 
-            
-            onCalculate({ 
-                priceMin: finalPrice, 
-                priceMax: Math.ceil(finalPrice * 1.2 / 10) * 10, 
-                details: `Área: ${area}cm². Estilo: ${input.complexity}.` 
-            });
-            setCalculating(false);
-          };
-
-          return (
-            <div className="space-y-4 animate-in">
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs text-zinc-500 mb-1 block">Largura (cm)</label><input type="number" value={input.width} onChange={e => setInput({...input, width: parseFloat(e.target.value)||0})} className="w-full bg-ink-950 border border-ink-700 rounded-lg p-3 text-white focus:border-gold-500 outline-none" /></div>
-                <div><label className="text-xs text-zinc-500 mb-1 block">Altura (cm)</label><input type="number" value={input.height} onChange={e => setInput({...input, height: parseFloat(e.target.value)||0})} className="w-full bg-ink-950 border border-ink-700 rounded-lg p-3 text-white focus:border-gold-500 outline-none" /></div>
-              </div>
-              <select value={input.complexity} onChange={e => setInput({...input, complexity: e.target.value})} className="w-full bg-ink-950 border border-ink-700 rounded-lg p-3 text-white focus:border-gold-500 outline-none">
-                {Object.keys(COMPLEXITY_MULTIPLIERS).map(k => <option key={k} value={k}>{k}</option>)}
-              </select>
-              <input type="number" value={input.extras} onChange={e => setInput({...input, extras: parseFloat(e.target.value)||0})} placeholder="Custos Extras (R$)" className="w-full bg-ink-950 border border-ink-700 rounded-lg p-3 text-white focus:border-gold-500 outline-none" />
-              <button onClick={calc} disabled={calculating} className="w-full py-4 bg-zinc-100 hover:bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-xl flex items-center justify-center gap-2">
-                {calculating ? <Loader2 className="animate-spin" size={18} /> : <Calculator size={18} />} 
-                {calculating ? 'Calculando...' : 'Calcular Orçamento (1 Moeda)'}
-              </button>
-            </div>
-          );
-        };
-
-        // --- APP PRINCIPAL ---
         const App = () => {
-          const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ink_current_session') || 'null'));
-          const [settings] = useState(DEFAULT_SETTINGS);
-          const [activeTab, setActiveTab] = useState('manual');
-          const [result, setResult] = useState(null);
-          const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('inkHistory') || '[]'));
-          const [clientName, setClientName] = useState('');
-          const [studioName, setStudioName] = useState(() => localStorage.getItem('studioName') || '');
-
-          const handleLogin = (u) => { setUser(u); localStorage.setItem('ink_current_session', JSON.stringify(u)); };
-          const handleLogout = () => { setUser(null); localStorage.removeItem('ink_current_session'); };
-
-          const useCredit = async (cost = 1) => {
-            if (!user) return false;
-            if ((user.credits || 0) < cost) { 
-                alert(`Saldo insuficiente! Esta ação custa ${cost} moedas.`); 
-                return false; 
-            }
+            const [user, setUser] = useState(null);
+            const [email, setEmail] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [activeTab, setActiveTab] = useState('price');
             
-            // Tenta atualizar no servidor
-            const newCredits = (user.credits || 0) - cost;
-            const { error } = await supabase.from('clientes').update({ credits: newCredits }).eq('id', user.id);
-            
-            if (error) {
-                console.error("Erro ao debitar", error);
+            // Calculadora
+            const [width, setWidth] = useState(10);
+            const [height, setHeight] = useState(10);
+            const [complexity, setComplexity] = useState(1.0);
+            const [price, setPrice] = useState(null);
+
+            // IA
+            const [aiInput, setAiInput] = useState('');
+            const [aiResult, setAiResult] = useState('');
+            const [aiLoading, setAiLoading] = useState(false);
+
+            useEffect(() => { lucide.createIcons(); }, [user, activeTab, price, aiResult]);
+
+            const handleLogin = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                const { data } = await supabaseClient.from('clientes').select('*').eq('email', email.trim().toLowerCase()).single();
+                if (data) setUser(data);
+                else alert('E-mail não encontrado!');
+                setLoading(false);
+            };
+
+            const calculatePrice = () => {
+                const total = Math.ceil((100 + (width * height * 2.5)) * complexity);
+                setPrice(total);
+            };
+
+            const generateAI = async (type) => {
+                if (!aiInput) return alert('Digite algo!');
+                if ((user.credits || 0) < 1) return alert('Sem moedas!');
+                
+                setAiLoading(true);
+                setAiResult('');
+                
+                const newCredits = (user.credits || 0) - 1;
+                await supabaseClient.from('clientes').update({ credits: newCredits }).eq('id', user.id);
+                setUser({...user, credits: newCredits});
+
+                let prompt = type === 'stencil' 
+                    ? `Crie um guia técnico de stencil para tattoo: "${aiInput}". Camadas, sombras e agulhas.`
+                    : `Crie legenda de Instagram para tattoo: "${aiInput}". Use hashtags e emojis.`;
+                
+                const text = await callGemini(prompt);
+                setAiResult(text);
+                setAiLoading(false);
+            };
+
+            // TELA DE LOGIN COM PLANOS
+            if (!user) {
+                return (
+                    <div className="min-h-screen bg-black flex flex-col items-center py-10 px-4">
+                        <div className="text-center mb-10">
+                            <div className="inline-block p-3 rounded-full bg-ink-900 border border-gold-500 mb-4"><Icon name="pen-tool" /></div>
+                            <h1 className="text-4xl font-display font-bold text-white">InkEstimate <span className="text-gold-500">Pro</span></h1>
+                            <p className="text-zinc-500 mt-2">Área do Membro</p>
+                        </div>
+
+                        {/* PLANOS DE VENDA (VOLTARAM!) */}
+                        <div className="grid md:grid-cols-3 gap-6 max-w-5xl w-full mb-12">
+                            {[
+                                { name: 'Iniciante', price: '29,90', credits: 100, link: 'https://mpago.la/2p41zpx' },
+                                { name: 'Profissional', price: '59,90', credits: 400, link: 'https://mpago.la/342uX85', best: true },
+                                { name: 'Studio', price: '149,90', credits: 1000, link: 'https://mpago.la/1TJHEY3' }
+                            ].map(plan => (
+                                <div key={plan.name} className={`glass p-6 rounded-2xl relative ${plan.best ? 'border-gold-500 transform scale-105' : 'border-ink-800'}`}>
+                                    {plan.best && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold-500 text-black text-xs font-bold px-3 py-1 rounded-full">MAIS VENDIDO</span>}
+                                    <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                                    <div className="text-3xl font-bold text-gold-500 mb-4">R$ {plan.price}</div>
+                                    <p className="text-sm text-zinc-400 mb-6 flex items-center gap-2"><Icon name="coins" /> {plan.credits} Moedas</p>
+                                    <a href={plan.link} target="_blank" className={`block text-center w-full py-3 rounded-xl font-bold ${plan.best ? 'bg-gold-500 text-black' : 'bg-ink-800 text-white'}`}>Assinar</a>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="glass p-8 rounded-2xl w-full max-w-md border border-ink-800">
+                            <p className="text-center text-zinc-400 mb-4 text-sm uppercase">Já é assinante?</p>
+                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Seu E-mail" className="w-full bg-ink-950 border border-ink-700 text-white p-3 rounded-lg mb-4 text-center focus:border-gold-500 outline-none" />
+                            <button onClick={handleLogin} disabled={loading} className="w-full bg-gold-500 text-black font-bold p-3 rounded-lg hover:bg-gold-400">
+                                {loading ? 'Entrando...' : 'ACESSAR SISTEMA'}
+                            </button>
+                        </div>
+                    </div>
+                );
             }
 
-            const updatedUser = { ...user, credits: newCredits };
-            setUser(updatedUser); 
-            localStorage.setItem('ink_current_session', JSON.stringify(updatedUser));
-            return true;
-          };
-
-          const addHistory = (item) => {
-            const h = [item, ...history]; setHistory(h); localStorage.setItem('inkHistory', JSON.stringify(h));
-          };
-
-          if (!user) return <AuthScreen onLogin={handleLogin} />;
-
-          const navItems = [
-            { id: 'manual', label: 'Preço', icon: Calculator, color: 'bg-blue-600' },
-            { id: 'stencil', label: 'Artes', icon: Layers, color: 'bg-indigo-600' },
-            { id: 'marketing', label: 'Social', icon: Instagram, color: 'bg-pink-600' },
-            { id: 'assistant', label: 'Vendas', icon: MessageSquare, color: 'bg-emerald-600' },
-            { id: 'history', label: 'Jobs', icon: History, color: 'bg-zinc-700' }
-          ];
-
-          return (
-            <div className="min-h-screen bg-ink-950 pb-20">
-              {/* Header */}
-              <header className="bg-ink-900 border-b border-ink-800 h-16 sticky top-0 z-40 px-4 flex items-center justify-between shadow-xl backdrop-blur-md">
-                <div className="flex items-center gap-2">
-                  <div className="bg-gold-500 p-1.5 rounded-lg text-black shadow-lg"><PenTool size={18} /></div>
-                  <h1 className="font-display font-bold text-lg text-white">InkEstimate <span className="text-gold-500">Pro</span></h1>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 bg-ink-950 border border-ink-800 px-3 py-1.5 rounded-full">
-                    <Coins size={14} className="text-gold-500" />
-                    <span className="text-xs font-black">{user.credits || 0}</span>
-                  </div>
-                  <button onClick={handleLogout} className="p-2 bg-ink-950 rounded-lg border border-ink-800 text-zinc-400 hover:text-red-500"><LogOut size={18} /></button>
-                </div>
-              </header>
-
-              <main className="max-w-4xl mx-auto p-4 sm:p-8 space-y-6">
-                {/* Navegação */}
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {navItems.map(item => (
-                    <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex-shrink-0 flex flex-col items-center justify-center gap-1.5 py-4 px-6 rounded-xl border transition-all ${activeTab === item.id ? `${item.color} border-white/20 shadow-lg scale-105` : 'bg-ink-900 border-ink-800 text-zinc-500'}`}>
-                      <item.icon size={18} />
-                      <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                   <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Nome do Cliente" className="bg-ink-900 border border-ink-800 rounded-xl p-3 text-sm text-white" />
-                   <input type="text" value={studioName} onChange={e => { setStudioName(e.target.value); localStorage.setItem('studioName', e.target.value); }} placeholder="Seu Estúdio" className="bg-ink-900 border border-ink-800 rounded-xl p-3 text-sm text-white" />
-                </div>
-
-                {/* Conteúdo da Aba */}
-                <div className="bg-ink-900 border border-ink-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative min-h-[400px]">
-                  <div className={`absolute top-0 left-0 w-full h-1 rounded-t-3xl ${activeTab === 'manual' ? 'bg-blue-500' : activeTab === 'stencil' ? 'bg-indigo-500' : activeTab === 'marketing' ? 'bg-pink-500' : activeTab === 'assistant' ? 'bg-emerald-500' : 'bg-zinc-500'}`}></div>
-                  
-                  {activeTab === 'manual' && (
-                    <div className="grid md:grid-cols-2 gap-8">
-                      <ManualCalculator settings={settings} onCalculate={(res) => { setResult(res); addHistory({...res, id: Date.now(), timestamp: Date.now(), clientName: clientName || 'Tattoo', type: 'Manual'}); }} useCredit={useCredit} />
-                      {result ? (
-                        <div className="bg-ink-950 rounded-2xl border border-ink-700 p-8 text-center animate-in">
-                          <p className="text-zinc-500 text-xs font-black uppercase mb-1 tracking-widest">Preço Sugerido</p>
-                          <div className="text-5xl font-display font-bold text-white mb-6">{settings.currency} {result.priceMin} - {result.priceMax}</div>
-                          <div className="bg-black/40 p-4 rounded-xl border border-ink-800 text-[10px] text-zinc-500 leading-relaxed mb-6">{result.details}</div>
-                          <button onClick={() => { navigator.clipboard.writeText(`Orçamento: ${settings.currency} ${result.priceMin} - ${result.priceMax}`); alert("Copiado!"); }} className="flex items-center gap-2 mx-auto text-gold-500 text-[10px] font-black uppercase tracking-widest"><Share2 size={16} /> Compartilhar</button>
+            // TELA DO SISTEMA
+            return (
+                <div className="min-h-screen bg-ink-950 pb-20">
+                    <header className="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center mb-8 border-b border-white/5">
+                        <span className="font-display font-bold text-lg text-white">InkEstimate <span className="text-gold-500">Pro</span></span>
+                        <div className="flex items-center gap-2 bg-ink-900 px-3 py-1 rounded-full border border-gold-500/30">
+                            <span className="text-gold-500 font-bold text-sm">💰 {user.credits}</span>
                         </div>
-                      ) : <div className="border-2 border-dashed border-ink-800 rounded-2xl p-10 flex flex-col items-center justify-center text-zinc-700 text-center"><DollarSign size={48} className="opacity-20 mb-4" /><p className="text-sm">Calcule as medidas ao lado para ver o orçamento.</p></div>}
-                    </div>
-                  )}
+                    </header>
 
-                  {activeTab === 'history' && (
-                    <div className="space-y-4">
-                      <h3 className="text-zinc-200 font-display font-bold text-xl mb-6 flex items-center gap-2"><History size={20} className="text-gold-500" /> Histórico de Jobs</h3>
-                      {history.length === 0 ? <p className="text-zinc-600 text-center py-20">Nenhum job registrado ainda.</p> : history.map(h => (
-                        <div key={h.id} className="bg-ink-950 border border-ink-800 p-4 rounded-2xl flex justify-between items-center group transition-colors hover:border-zinc-700">
-                           <div>
-                             <p className="text-[9px] text-zinc-500 uppercase font-black">{new Date(h.timestamp).toLocaleString()}</p>
-                             <p className="text-sm font-bold text-white">{h.clientName} - {h.type}</p>
-                             <p className="text-xs text-zinc-400">{h.details}</p>
-                           </div>
-                           <div className="text-right flex items-center gap-3">
-                             {h.priceMin > 0 && <p className="text-gold-500 font-black text-sm">{settings.currency} {h.priceMin}</p>}
-                             <button onClick={() => { const h2 = history.filter(i => i.id !== h.id); setHistory(h2); localStorage.setItem('inkHistory', JSON.stringify(h2)); }} className="text-zinc-700 hover:text-red-500"><Trash2 size={18} /></button>
-                           </div>
+                    <main className="max-w-3xl mx-auto px-4">
+                        <div className="flex gap-2 overflow-x-auto pb-4 mb-4">
+                            {[{id:'price', l:'Calculadora', i:'calculator'}, {id:'stencil', l:'IA Stencil', i:'layers'}, {id:'marketing', l:'IA Social', i:'instagram'}].map(t => (
+                                <button key={t.id} onClick={() => {setActiveTab(t.id); setAiResult('');}} className={`flex items-center gap-2 px-4 py-3 rounded-lg border whitespace-nowrap ${activeTab === t.id ? 'bg-gold-500 text-black border-gold-500 font-bold' : 'bg-ink-900 text-zinc-400 border-ink-800'}`}>
+                                    <Icon name={t.i} /> {t.l}
+                                </button>
+                            ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Placeholders */}
-                  {(activeTab === 'stencil' || activeTab === 'marketing' || activeTab === 'assistant') && (
-                      <div className="flex flex-col items-center justify-center h-full text-center py-20">
-                          <Layers size={48} className="text-zinc-800 mb-4" />
-                          <p className="text-zinc-500 mb-2">Módulo em desenvolvimento.</p>
-                          <p className="text-xs text-zinc-600 max-w-xs mx-auto">Em breve: Stencils IA e Marketing Automático estarão disponíveis aqui usando sua chave do Google Gemini.</p>
-                      </div>
-                  )}
-                  
+
+                        {activeTab === 'price' && (
+                            <div className="glass p-6 rounded-2xl border-t border-white/5 animate-in space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="text-xs font-bold text-zinc-500">LARGURA (CM)</label><input type="number" value={width} onChange={e => setWidth(Number(e.target.value))} className="w-full bg-ink-900 border border-ink-700 p-3 rounded-lg text-white font-bold text-center mt-1" /></div>
+                                    <div><label className="text-xs font-bold text-zinc-500">ALTURA (CM)</label><input type="number" value={height} onChange={e => setHeight(Number(e.target.value))} className="w-full bg-ink-900 border border-ink-700 p-3 rounded-lg text-white font-bold text-center mt-1" /></div>
+                                </div>
+                                <div><label className="text-xs font-bold text-zinc-500">COMPLEXIDADE</label><div className="grid grid-cols-3 gap-2 mt-1">{[{l:'Traço',v:1.0},{l:'Sombra',v:1.3},{l:'Realismo',v:1.8}].map(o => <button key={o.l} onClick={() => setComplexity(o.v)} className={`p-2 rounded border text-sm ${complexity === o.v ? 'border-gold-500 text-gold-500' : 'border-ink-800 text-zinc-500'}`}>{o.l}</button>)}</div></div>
+                                <button onClick={calculatePrice} className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200">CALCULAR</button>
+                                {price && <div className="text-center mt-4 pt-4 border-t border-white/10"><div className="text-5xl font-display font-bold text-gold-500">R$ {price}</div></div>}
+                            </div>
+                        )}
+
+                        {(activeTab === 'stencil' || activeTab === 'marketing') && (
+                            <div className="glass p-6 rounded-2xl border-t border-white/5 animate-in">
+                                <textarea value={aiInput} onChange={e => setAiInput(e.target.value)} placeholder="Descreva sua ideia..." className="w-full h-32 bg-ink-900 border border-ink-700 rounded-lg p-4 text-white focus:border-gold-500 outline-none mb-4 resize-none"></textarea>
+                                <button onClick={() => generateAI(activeTab)} disabled={aiLoading} className="w-full bg-gold-500 text-black font-bold py-3 rounded-lg hover:bg-gold-400 flex justify-center gap-2">
+                                    {aiLoading ? <span className="loading-dots">CRIANDO</span> : <span>✨ GERAR (1 MOEDA)</span>}
+                                </button>
+                                {aiResult && <div className="mt-6 bg-ink-900 p-6 rounded-xl border border-ink-800 text-zinc-300 whitespace-pre-wrap">{aiResult}</div>}
+                            </div>
+                        )}
+                    </main>
                 </div>
-              </main>
-            </div>
-          );
+            );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
