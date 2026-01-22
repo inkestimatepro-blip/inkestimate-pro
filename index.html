@@ -7,14 +7,8 @@
     <title>InkEstimate Pro</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;700&family=Sacramento&family=UnifrakturMaguntia&family=Caveat:wght@400;700&family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Playfair+Display:wght@400;900&family=Pinyon+Script&family=Qwitcher+Grypen&family=Pirata+One&family=Special+Elite&family=Courier+Prime&family=VT323&family=Montserrat:wght@100;400;900&family=Bebas+Neue&family=Poppins:wght@100;900&family=Raleway:wght@100;400;900&family=Lato:wght@100;400;900&family=Roboto:wght@100;400;900&family=Open+Sans:wght@300;400;800&family=Julius+Sans+One&family=Poiret+One&family=Josefin+Sans:wght@100;400;700&family=Comfortaa:wght@300;700&family=Barlow:wght@100;400;900&family=Abel&family=Didact+Gothic&family=Questrial&family=Maven+Pro:wght@400;900&family=Geo&family=Wire+One&family=Stalemate&family=Monsieur+La+Doulaise&family=Herr+Von+Muellerhoff&family=Mrs+Saint+Delafield&family=WindSong&family=Allura&family=Parisienne&family=Italianno&family=Euphoria+Script&family=Qwigley&family=Ruthie&family=Petit+Formal+Script&family=Meddon&family=Cedarville+Cursive&family=Nothing+You+Could+Do&family=Shadows+Into+Light&family=Amatic+SC:wght@400;700&family=Waiting+for+the+Sunrise&family=La+Belle+Aurore&family=Homemade+Apple&family=Reenie+Beanie&family=Bad+Script&family=Marck+Script&family=Mr+Bedfort&family=Over+the+Rainbow&family=Germania+One&family=Sancreek&family=Rye&family=Diplomata&family=Metal+Mania&family=Bungee+Shade&family=Ewert&family=Shojumaru&family=Kaushan+Script&family=Cookie&family=Grand+Hotel&family=Satisfy&family=Courgette&family=Damion&family=Yellowtail&family=Rochester&family=Clicker+Script&family=Bilbo&family=Delius&family=Handlee&family=Patrick+Hand&family=Gloria+Hallelujah&family=Gochi+Hand&family=Indie+Flower&family=Kalam&family=Permanent+Marker&family=Rock+Salt&family=Covered+By+Your+Grace&family=Architects+Daughter&family=Pacifico&family=Lobster&family=Lobster+Two&family=Bungee&family=Urban+Jungle&family=Tangerine&family=Miss+Fajardose&family=Lovers+Quarrel&family=Kristi&family=Mr+De+Havilland&family=Rouge+Script&family=Bilbo+Swash+Caps&family=Butterfly+Kids&family=Princess+Sofia&family=Quintessential&family=Jim+Nightshade&family=Dr+Sugiyama&family=Felipa&family=Redressed&family=Vibur&family=Meie+Script&family=Aguafina+Script&family=Condiment&family=Dynalight&family=Eagle+Lake&family=Engagement&family=Griffy&family=Henny+Penny&family=Julee&family=Macondo+Swash&family=Miniver&family=Modern+Antiqua&family=Montez&family=Norican&family=Oleo+Script&family=Original+Surfer&family=Paprika&family=Rancho&family=Ribeye&family=Risque&family=Sail&family=Sarina&family=Seaweed+Script&family=Simonetta&family=Sirin+Stencil&family=Snowburst+One&family=Sonsie+One&family=Spirax&family=Supermercado+One&family=Trade+Winds&family=Trocchi&family=Trykker&family=Tulpen+One&family=Uncial+Antiqua&family=Underdog&family=Vast+Shadow&family=Warnes&family=Wellfleet&family=Wendy+One&family=Yesteryear&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;700&family=Sacramento&family=UnifrakturMaguntia&family=Caveat:wght@400;700&family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Playfair+Display:wght@400;900&family=Pinyon+Script&family=Qwitcher+Grypen&family=Pirata+One&family=Special+Elite&family=Courier+Prime&family=VT323&family=Montserrat:wght@100;400;900&family=Bebas+Neue&family=Poppins:wght@100;900&family=Raleway:wght@100;400;900&family=Lato:wght@100;400;900&family=Roboto:wght@100;400;900&family=Open+Sans:wght@300;400;800&display=swap" rel="stylesheet">
     
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
     <script>
       tailwind.config = {
         theme: {
@@ -26,7 +20,7 @@
             colors: {
               ink: { 950: '#0a0a0a', 900: '#171717', 800: '#262626', 700: '#404040' },
               gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
-              highlight: '#3b82f6' /* AZUL DO STUDIO */
+              highlight: '#3b82f6' /* AZUL STUDIO */
             }
           }
         }
@@ -34,37 +28,25 @@
     </script>
     <style>
       body { background-color: #000000; color: #e5e5e5; }
-      /* Estilo dos Inputs igual ao Print */
       .studio-input {
-        background-color: #0f0f0f;
-        border: 1px solid #27272a;
-        color: white;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: 600;
-        width: 100%;
-        outline: none;
+        background-color: #0f0f0f; border: 1px solid #27272a; color: white;
+        padding: 12px; border-radius: 8px; font-weight: 600; width: 100%; outline: none;
       }
       .studio-input:focus { border-color: #3b82f6; }
-      
-      /* Botões de Nível */
       .level-btn {
-        background-color: #0f0f0f;
-        border: 1px solid #27272a;
-        color: #a1a1aa;
-        padding: 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: bold;
-        text-align: left;
-        transition: all 0.2s;
+        background-color: #0f0f0f; border: 1px solid #27272a; color: #a1a1aa;
+        padding: 10px; border-radius: 6px; font-size: 12px; font-weight: bold; text-align: left; transition: all 0.2s;
       }
-      .level-btn.active {
-        background-color: #ffffff;
-        color: #000000;
-        border-color: #ffffff;
-      }
+      .level-btn.active { background-color: #ffffff; color: #000000; border-color: #ffffff; }
+      .loading-dots:after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
+      @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
     </style>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div id="root"></div>
@@ -79,7 +61,7 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnbWRwbGNjZ3ZsY2ZyZmZ3Z3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1OTM0NDYsImV4cCI6MjA4NDE2OTQ0Nn0.Uy9NGijSIXytVYw-19szOXdet96uiY8xHQlW36K7xAg';
         const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-        const Icon = ({ name, size=20 }) => <i data-lucide={name} style={{fontSize: size}}></i>;
+        const Icon = ({ name, size = 20, className }) => <i data-lucide={name} style={{fontSize: size}} className={className}></i>;
 
         const App = () => {
             const [user, setUser] = useState(null);
@@ -92,12 +74,13 @@
             const [height, setHeight] = useState(10);
             const [complexity, setComplexity] = useState('Traço');
             const [bodyPart, setBodyPart] = useState('Braço/Antebraço');
-            const [extras, setExtras] = useState(0);
+            const [extras, setExtras] = useState(''); // Começa vazio para não bugar
             const [price, setPrice] = useState(null);
             
             // DADOS IA
             const [aiInput, setAiInput] = useState('');
             const [aiResult, setAiResult] = useState('');
+            const [aiLoading, setAiLoading] = useState(false);
 
             useEffect(() => { lucide.createIcons(); }, [user, activeTab, price, aiResult]);
 
@@ -109,15 +92,55 @@
             };
 
             const calculate = () => {
-                const area = width * height;
-                let mult = 1;
-                if(complexity === 'Sombra') mult = 1.3;
-                if(complexity === 'Realismo') mult = 1.8;
+                // 1. Área
+                const area = Number(width) * Number(height);
+                
+                // 2. Multiplicador de Complexidade
+                let mult = 1.0; // Padrão Traço
+                if(complexity === 'Sombra') mult = 1.2;
+                if(complexity === 'Realismo') mult = 1.5;
                 if(complexity === 'Cobertura') mult = 2.0;
-                setPrice(Math.ceil((100 + (area * 3)) * mult + Number(extras)));
+
+                // 3. Preço Base por cm² (ajustável aqui se achar caro/barato)
+                const pricePerCm = 3.0; 
+
+                // 4. Custo Fixo de Material (Setup)
+                const baseSetup = 100;
+
+                // FÓRMULA CORRIGIDA: Base + (Tatuagem * Complexidade) + Extras
+                const tattooPrice = (area * pricePerCm * mult);
+                const finalPrice = Math.ceil(baseSetup + tattooPrice + Number(extras));
+
+                setPrice(finalPrice);
             };
 
-            // --- TELA DE LOGIN (COM OS PLANOS DE VOLTA) ---
+            const generateAI = async (type) => {
+                if (!aiInput) return alert('Digite algo!');
+                if ((user.credits || 0) < 1) return alert('Saldo insuficiente!');
+                
+                setAiLoading(true); setAiResult('');
+                const newCredits = (user.credits || 0) - 1;
+                await supabaseClient.from('clientes').update({ credits: newCredits }).eq('id', user.id);
+                setUser({...user, credits: newCredits});
+
+                // Função de chamada ao Google Gemini
+                try {
+                    const prompt = type === 'stencil' 
+                        ? `Aja como um tatuador expert. Crie um guia de stencil para: "${aiInput}". \nSepare por: Camadas, Sombras e Agulhas.` 
+                        : `Crie uma legenda de Instagram profissional para tattoo sobre: "${aiInput}". Use hashtags.`;
+                    
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GOOGLE_API_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await response.json();
+                    setAiResult(data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro na IA.");
+                } catch (e) { setAiResult("Erro de conexão."); }
+                setAiLoading(false);
+            };
+
+            // --- TELA LOGIN (COM PLANOS) ---
             if (!user) {
                 return (
                     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-black">
@@ -125,8 +148,6 @@
                             <h1 className="text-4xl font-display font-bold text-white mb-2">InkEstimate <span className="text-gold-500">Pro</span></h1>
                             <p className="text-zinc-500 uppercase tracking-widest text-xs">Área de Membros</p>
                         </div>
-
-                        {/* PLANOS MERCADO PAGO */}
                         <div className="grid md:grid-cols-3 gap-4 w-full max-w-5xl mb-12">
                             {[
                                 { name: 'Iniciante', price: '29,90', link: 'https://mpago.la/2p41zpx', coins: 100 },
@@ -141,7 +162,6 @@
                                 </div>
                             ))}
                         </div>
-
                         <div className="bg-zinc-900 p-8 rounded-xl border border-zinc-800 w-full max-w-md">
                             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Seu E-mail de Assinante" className="w-full bg-black border border-zinc-700 p-3 rounded-lg text-white text-center mb-4" />
                             <button onClick={handleLogin} disabled={loading} className="w-full bg-gold-500 text-black font-bold p-3 rounded-lg hover:bg-gold-400 uppercase tracking-widest">
@@ -152,120 +172,65 @@
                 );
             }
 
-            // --- TELA DO SISTEMA (VISUAL IDÊNTICO AO PRINT) ---
+            // --- TELA SISTEMA ---
             return (
                 <div className="min-h-screen bg-black text-white pb-20">
-                    {/* Header */}
                     <div className="flex justify-between items-center p-6 border-b border-zinc-800">
                         <h1 className="text-xl font-bold flex items-center gap-2"><Icon name="pen-tool" className="text-gold-500"/> INKESTIMATE <span className="text-gold-500">PRO</span></h1>
                         <div className="bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800 text-gold-500 font-bold text-sm">💰 {user.credits}</div>
                     </div>
 
                     <main className="max-w-5xl mx-auto mt-10 px-4">
-                        {/* BOTÕES DE NAVEGAÇÃO (AZUL NO ATIVO) */}
-                        <div className="flex justify-center gap-2 mb-8">
+                        <div className="flex justify-center gap-2 mb-8 overflow-x-auto pb-2">
                             {[
-                                {id: 'price', l: 'PREÇO', i: 'calculator'},
-                                {id: 'letras', l: 'LETRAS', i: 'type'},
-                                {id: 'artes', l: 'ARTES', i: 'image'},
-                                {id: 'insta', l: 'INSTA', i: 'instagram'},
-                                {id: 'vendas', l: 'VENDAS', i: 'message-square'},
-                                {id: 'jobs', l: 'JOBS', i: 'history'},
+                                {id: 'price', l: 'PREÇO', i: 'calculator'}, {id: 'letras', l: 'LETRAS', i: 'type'},
+                                {id: 'artes', l: 'ARTES', i: 'image'}, {id: 'insta', l: 'INSTA', i: 'instagram'},
+                                {id: 'vendas', l: 'VENDAS', i: 'message-square'}, {id: 'jobs', l: 'JOBS', i: 'history'},
                             ].map(tab => (
-                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center justify-center p-4 rounded-xl min-w-[80px] border transition-all ${activeTab === tab.id ? 'bg-blue-600 border-blue-600 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:bg-zinc-800'}`}>
-                                    <Icon name={tab.i} />
-                                    <span className="text-[10px] font-bold mt-2 tracking-widest">{tab.l}</span>
+                                <button key={tab.id} onClick={() => { setActiveTab(tab.id); setAiResult(''); }} className={`flex flex-col items-center justify-center p-4 rounded-xl min-w-[80px] border transition-all ${activeTab === tab.id ? 'bg-blue-600 border-blue-600 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:bg-zinc-800'}`}>
+                                    <Icon name={tab.i} /> <span className="text-[10px] font-bold mt-2 tracking-widest">{tab.l}</span>
                                 </button>
                             ))}
                         </div>
 
-                        {/* INPUTS DE NOME */}
-                        <div className="grid grid-cols-2 gap-4 mb-8">
-                            <input className="studio-input" placeholder="Nome do Cliente" />
-                            <input className="studio-input" placeholder="Seu Estúdio" />
-                        </div>
-
-                        {/* LINHA DIVISÓRIA AZUL */}
-                        <div className="h-px w-full bg-blue-600/30 mb-8"></div>
-
                         {activeTab === 'price' && (
                             <div className="grid md:grid-cols-2 gap-10">
-                                {/* LADO ESQUERDO: CALCULADORA */}
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs text-zinc-500 mb-1 block uppercase font-bold">Largura (cm)</label>
-                                            <input type="number" value={width} onChange={e => setWidth(Number(e.target.value))} className="studio-input text-center text-xl" />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs text-zinc-500 mb-1 block uppercase font-bold">Altura (cm)</label>
-                                            <input type="number" value={height} onChange={e => setHeight(Number(e.target.value))} className="studio-input text-center text-xl" />
-                                        </div>
+                                        <div><label className="text-xs text-zinc-500 mb-1 block uppercase font-bold">Largura (cm)</label><input type="number" value={width} onChange={e => setWidth(e.target.value)} className="studio-input text-center text-xl" /></div>
+                                        <div><label className="text-xs text-zinc-500 mb-1 block uppercase font-bold">Altura (cm)</label><input type="number" value={height} onChange={e => setHeight(e.target.value)} className="studio-input text-center text-xl" /></div>
                                     </div>
-
                                     <div className="text-center text-amber-500 text-xs font-bold">⚡ Área Total: {width * height} cm²</div>
-
                                     <div>
                                         <label className="text-xs text-zinc-500 mb-2 block uppercase font-bold">Estilo & Complexidade</label>
                                         <div className="grid grid-cols-2 gap-3">
-                                            {['Nível 1: Traço', 'Nível 2: Sombreado', 'Nível 3: Realismo', 'Nível 4: Cobertura'].map(lvl => (
-                                                <button key={lvl} onClick={() => setComplexity(lvl.split(': ')[1])} className={`level-btn ${complexity === lvl.split(': ')[1] ? 'active' : ''}`}>{lvl}</button>
+                                            {['Traço', 'Sombra', 'Realismo', 'Cobertura'].map(lvl => (
+                                                <button key={lvl} onClick={() => setComplexity(lvl)} className={`level-btn ${complexity === lvl ? 'active' : ''}`}>{lvl}</button>
                                             ))}
                                         </div>
                                     </div>
-
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs text-zinc-500 mb-1 block uppercase font-bold">Local do Corpo</label>
-                                            <select className="studio-input text-sm">
-                                                <option>Braço/Antebraço</option>
-                                                <option>Perna/Panturrilha</option>
-                                                <option>Costela</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="text-xs text-amber-500 mb-1 block uppercase font-bold">Custos Extras (R$)</label>
-                                            <input type="number" value={extras} onChange={e => setExtras(Number(e.target.value))} className="studio-input" />
-                                        </div>
+                                        <div><label className="text-xs text-zinc-500 mb-1 block uppercase font-bold">Local</label><select className="studio-input text-sm"><option>Braço</option><option>Perna</option><option>Costela</option></select></div>
+                                        <div><label className="text-xs text-amber-500 mb-1 block uppercase font-bold">Extras (R$)</label><input type="number" value={extras} onChange={e => setExtras(e.target.value)} className="studio-input" placeholder="0" /></div>
                                     </div>
-
                                     <button onClick={calculate} className="w-full bg-white hover:bg-zinc-200 text-black font-black py-4 rounded-lg uppercase tracking-widest flex items-center justify-center gap-2">
-                                        <Icon name="calculator" /> SOMAR E CALCULAR ORÇAMENTO (1 MOEDA)
+                                        <Icon name="calculator" /> CALCULAR AGORA
                                     </button>
                                 </div>
-
-                                {/* LADO DIREITO: RESULTADO */}
                                 <div className="bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
                                     {price ? (
                                         <div className="animate-in fade-in zoom-in">
-                                            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-4">Valor Estimado</p>
+                                            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-4">Orçamento Sugerido</p>
                                             <div className="text-7xl font-bold text-white mb-4">R$ {price}</div>
-                                            <p className="text-zinc-400 text-sm mb-8">Orçamento calculado com base na área de {width * height}cm²</p>
+                                            <p className="text-zinc-400 text-sm mb-8">Baseado em {width}x{height}cm</p>
                                             <button className="bg-blue-600/20 text-blue-500 px-6 py-2 rounded-full font-bold text-sm hover:bg-blue-600 hover:text-white transition-all">Copiar Valor</button>
                                         </div>
-                                    ) : (
-                                        <div className="opacity-20 text-zinc-500">
-                                            <Icon name="dollar-sign" size={64} className="mx-auto mb-4"/>
-                                            <p className="max-w-xs">Preencha os dados ao lado e clique em calcular para ver a estimativa.</p>
-                                        </div>
-                                    )}
+                                    ) : <div className="opacity-20 text-zinc-500"><Icon name="dollar-sign" size={64} className="mx-auto mb-4"/><p>Preencha os dados ao lado.</p></div>}
                                 </div>
                             </div>
                         )}
 
-                        {activeTab !== 'price' && (
-                            <div className="flex flex-col items-center justify-center py-20 opacity-30">
-                                <Icon name="construction" size={48} className="mb-4"/>
-                                <p>Módulo em desenvolvimento...</p>
-                            </div>
-                        )}
-                    </main>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+                        {(activeTab === 'artes' || activeTab === 'letras' || activeTab === 'insta' || activeTab === 'vendas') && (
+                            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8">
+                                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Icon name="sparkles" className="text-gold-500"/> IA Studio</h2>
+                                <textarea value={aiInput} onChange={e => setAiInput(e.target.value)} className="w-full h-32 bg-black border border-zinc-700 rounded-lg p-4 text-white mb-4 outline-none" placeholder={activeTab === 'insta' ? "Descreva a tattoo para a legenda..." : "Descreva a ideia para o stencil..."}></
